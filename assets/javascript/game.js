@@ -97,7 +97,7 @@ function addWin() {
 }
 
 function restart() {
-	document.querySelector('#missed-letters').innerHTML = "Letters already guessed: ";
+	document.querySelector('#missed-letters').innerHTML = "Incorrect Guesses: ";
 	word = null;
 	lettersOfTheWord = [];
 	correctGuesses = [];
