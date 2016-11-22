@@ -1,72 +1,117 @@
-var userWrongGuess = [];
-var word = randomWord;
-var guesses = [];
-var wins = 0;
-var guessesLeft= 12;
-var randomWord;
-var figures = ["zeus", "aphrodite", "apollo", "artemis", "athena", "dionysus", "hephaestus", "poseidon", "hades", "demeter", "persephone", "ares", "cronus", "heracles", "eros", "echo", "narcissus"];
-var randomWord = figures[Math.floor(Math.random() * figures.length)];
-	console.log(randomWord);
-var remainingLetters = randomWord.length;
 
+var figures = [ "zeus", "aphrodite", "apollo", "artemis", "athena", "dionysus", "hephaestus", "poseidon", "hades", "demeter", "persephone", "ares", "cronus", "heracles", "eros", "echo", "narcissus"];
+var word = null;
+var lettersOfTheWord = [];
+var correctGuesses = [];
+var wrongGuesses = [];
+var guessesLeft = 0;
+var totalGuesses = 10;
+var letterGuesses = null;
+var wins = 0;
 
 function start() {
+	word = figures[Math.floor(Math.random() * figures.length)];
+	console.log(word);
+	lettersOfTheWord = word.split('');
+	wordDisplay();
+	processUpdateTotalGuesses();
+}
 
-
-
-var randomWord = figures[Math.floor(Math.random() * figures.length)];
-	console.log(randomWord); //shows in console randomWord
-
-for (var i = 0; i < randomWord.length; i++) {
-	guesses[i] = "_";
-	document.getElementById('letters').innerHTML=guesses;
+function updatePage(letter) {
+	if(guessesLeft == 0) {
+		var beginning2 = document.createElement('audio');
+		beginning2.setAttribute('src', "assets/images/short-boo.m4a");
+		beginning2.play();
+		restart();
+	} else {
+		updateGuesses(letter);
+		guessedCorrect(letter);
+		wordDisplay();
+		if(addWin() == true) {
+			restart();
+		}
 	}
-	
-	var remainingLetters = randomWord.length;
+}
 
-
-
-document.onkeyup = function(event){
-	var userGuess = String.fromCharCode(event.keyCode).toLowerCase();
-	
- 	for (var j = 0; j < randomWord.length; j++) { 
- 		if (randomWord[j] === userGuess) {
- 		guesses[j] = userGuess;
- 		remainingLetters--;
- 		} 
-	
- 	}
-	
- 	if (randomWord[j] !== userGuess) {
-		userWrongGuess.push(userGuess);
+function updateGuesses(letter) {
+	if((wrongGuesses.indexOf(letter) == -1) && (lettersOfTheWord.indexOf(letter) == -1)) {
+		wrongGuesses.push(letter);
 		guessesLeft--;
-	}
+		document.querySelector('#guesses-left').innerHTML = "Number of guesses remaining: " + guessesLeft;
 
-
-	if (guessesLeft === 0){
-		guessesLeft = 12;
-		userWrongGuess.length= 0;
-		guesses.length = 0;
-		start();
+		document.querySelector("#missed-letters").innerHTML = "Letters already guessed: " + wrongGuesses.join(', ');
 	}
-	if (remainingLetters === 0) {
-		wins++;
-		guessesLeft = 12;
-		userWrongGuess.length= 0;
-		guesses.length = 0;
-		start();
-	}
-	
-	document.getElementById('letters').innerHTML=guesses;
-	var correct = "Wins: " + wins;
-		document.querySelector("#winCounter").innerHTML = correct;
-	var guessesL = "Number of guesses remaining: " + guessesLeft;
-		document.querySelector("#guesses-left").innerHTML = guessesL;
-	var missedL = "Letters already guessed: " + userWrongGuess;
-		document.querySelector("#missed-letters").innerHTML = missedL;
 }
 
-
-	
+function guessedCorrect(letter) {
+	for (var i = 0; i < lettersOfTheWord.length; i++) {
+			if ((letter === lettersOfTheWord[i]) && (correctGuesses.indexOf(letter) == -1)){
+				correctGuesses.push(letter);
+			}
+		} 
 }
+
+function processUpdateTotalGuesses() {
+	guessesLeft = totalGuesses;
+	document.querySelector('#guesses-left').innerHTML = "Number of guesses remaining: " + guessesLeft;
+}
+
+function wordDisplay() {
+	var wordView = "";
+	for(var i=0; i < lettersOfTheWord.length; i++){
+			if (correctGuesses.indexOf(lettersOfTheWord[i]) != -1){
+				wordView += lettersOfTheWord[i];				
+			}else{
+				wordView += '&nbsp;_&nbsp;';
+			}
+		}
+
+		document.querySelector('#letters').innerHTML = wordView;
+}
+
+function addWin() {
+	if (correctGuesses.length == 0){
+			var win = false;
+		} else{
+			var win = true;
+		}
+		
+		for (var i=0; i < lettersOfTheWord.length; i++){
+			if (correctGuesses.indexOf(lettersOfTheWord[i]) == -1){
+				win = false;
+			}
+		}
+
+		if (win == true){
+			wins =  wins + 1;
+			var beginning = document.createElement('audio');
+    		beginning.setAttribute('src', "assets/images/short-applause.m4a");
+    		beginning.play();
+
+			document.querySelector('#winCounter').innerHTML = "Wins: " + wins;
+
+			return true;
+		}else{
+			return false;
+		}
+}
+
+function restart() {
+	document.querySelector('#missed-letters').innerHTML = "Letters already guessed: ";
+	wordInPlay = null;
+	lettersOfTheWord = [];
+	correctGuesses = [];
+	wrongGuesses = [];
+	guessesLeft = 0;
+	totalGuesses = 10;
+	letterGuessed = null;
+	start();
+	wordDisplay();
+}
+
 start();
+
+document.onkeyup = function(event) {
+	letterGuessed = String.fromCharCode(event.keyCode).toLowerCase();
+	updatePage(letterGuessed);
+};
