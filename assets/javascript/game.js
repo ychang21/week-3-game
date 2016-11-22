@@ -14,7 +14,7 @@ function start() {
 	console.log(word);
 	lettersOfTheWord = word.split('');
 	wordDisplay();
-	processUpdateTotalGuesses();
+	subtractGuesses();
 }
 
 function updatePage(letter) {
@@ -39,7 +39,7 @@ function updateGuesses(letter) {
 		guessesLeft--;
 		document.querySelector('#guesses-left').innerHTML = "Number of guesses remaining: " + guessesLeft;
 
-		document.querySelector("#missed-letters").innerHTML = "Letters already guessed: " + wrongGuesses.join(', ');
+		document.querySelector("#missed-letters").innerHTML = "Incorrect Guesses: " + wrongGuesses.join(', ');
 	}
 }
 
@@ -51,7 +51,7 @@ function guessedCorrect(letter) {
 		} 
 }
 
-function processUpdateTotalGuesses() {
+function subtractGuesses() {
 	guessesLeft = totalGuesses;
 	document.querySelector('#guesses-left').innerHTML = "Number of guesses remaining: " + guessesLeft;
 }
@@ -60,9 +60,9 @@ function wordDisplay() {
 	var wordView = "";
 	for(var i=0; i < lettersOfTheWord.length; i++){
 			if (correctGuesses.indexOf(lettersOfTheWord[i]) != -1){
-				wordView += lettersOfTheWord[i];				
+				wordView = wordView + lettersOfTheWord[i];				
 			}else{
-				wordView += '&nbsp;_&nbsp;';
+				wordView = wordView + '&nbsp;_&nbsp;';
 			}
 		}
 
@@ -98,7 +98,7 @@ function addWin() {
 
 function restart() {
 	document.querySelector('#missed-letters').innerHTML = "Letters already guessed: ";
-	wordInPlay = null;
+	word = null;
 	lettersOfTheWord = [];
 	correctGuesses = [];
 	wrongGuesses = [];
@@ -109,9 +109,9 @@ function restart() {
 	wordDisplay();
 }
 
-start();
-
 document.onkeyup = function(event) {
 	letterGuessed = String.fromCharCode(event.keyCode).toLowerCase();
 	updatePage(letterGuessed);
 };
+
+start();
